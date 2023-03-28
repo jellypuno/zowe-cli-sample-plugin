@@ -11,6 +11,7 @@
 import { ICommandHandler } from "@zowe/imperative";
 import * as zftp from "@zowe/zos-ftp-for-zowe-cli"
 import { zdcHandlerParams } from "../../../zdcHandlerParams"
+import { GetSessionDetails } from "../../../api/GetSessionDetails"
 
 export default class zdcDefinitionHandler implements ICommandHandler {
     public async process(params: zdcHandlerParams): Promise<void> {
@@ -18,6 +19,9 @@ export default class zdcDefinitionHandler implements ICommandHandler {
             owner: params.arguments.owner,
             status: params.arguments.status
         };
+
+        await GetSessionDetails.processWithSession(params);
+
         const filteredJobs = await zftp.JobUtils.listJobs(params.connection, params.jobname, options);
         params.response.data.setObj(filteredJobs);
         params.response.data.setMessage("Successfully listed %d matching jobs", filteredJobs.length);
